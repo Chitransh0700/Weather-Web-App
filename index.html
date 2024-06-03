@@ -1,0 +1,97 @@
+S<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weather App</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="card">
+        <div class="search">
+            <input type="text" placeholder="Search a city" class="search-bar" spellcheck="false">
+            <button class="search-btn"><img src="image/search.png"></button>
+        </div>
+        <div class="error">
+            <p>Invalid city name.</p>
+        </div>
+        <div class="weather">
+            <img src="image/rain.png" class="weather-icon">
+            <h1 class="temp">22°C</h1>
+            <h2 class="city">New York</h2>
+            <div class="details">
+                <div class="col">
+                    <img src="image/humidity.png">
+                    <div>
+                        <p class="humidity">50%</p>
+                        <p>Humidity</p>
+                    </div>
+                </div>
+                <div class="col">
+                    <img src="image/wind.png">
+                    <div>
+                        <p class="Wind">15 km/h</p>
+                        <p>Wind Speed</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const apiKey = "aa96e7d600f741401ddd77deff813519";
+        const searchBox = document.querySelector(".search input");
+        const searchBtn = document.querySelector(".search button");
+        const weatherIcon = document.querySelector(".weather-icon");
+        const errorDiv = document.querySelector(".error");
+        const weatherDiv = document.querySelector(".weather");
+        const cityDiv = document.querySelector(".city");
+        const tempDiv = document.querySelector(".temp");
+        const humidityDiv = document.querySelector(".humidity");
+        const windDiv = document.querySelector(".Wind");
+
+        async function checkWeather(city) {
+            const apiUrl = `https://api.openweathermap.org/data/2.5/weather?units=metric&q=${city}&appid=${apiKey}`;
+
+            try {
+                const response = await fetch(apiUrl);
+
+                if (response.status === 404) {
+                    errorDiv.style.display = "block";
+                    weatherDiv.style.display = "none";
+                } else {
+                    const data = await response.json();
+
+                    cityDiv.innerHTML = data.name;
+                    tempDiv.innerHTML = Math.round(data.main.temp) + "°C";
+                    humidityDiv.innerHTML = data.main.humidity + "%";
+                    windDiv.innerHTML = data.wind.speed + "km/h";
+
+                    if (data.weather[0].main === "Clouds") {
+                        weatherIcon.src = "image/cloud.png";
+                    } else if (data.weather[0].main === "Clear") {
+                        weatherIcon.src = "image/clear.png";
+                    } else if (data.weather[0].main === "Rain") {
+                        weatherIcon.src = "image/rain.png";
+                    } else if (data.weather[0].main === "Drizzle") {
+                        weatherIcon.src = "image/drizzle.png";
+                    } else if (data.weather[0].main === "Mist") {
+                        weatherIcon.src = "image/mist.png";
+                    }
+
+                    weatherDiv.style.display = "block";
+                    errorDiv.style.display = "none";
+                }
+            } catch (error) {
+                console.error("An error occurred:", error);
+            }
+        }
+
+        searchBtn.addEventListener("click", () => {
+            checkWeather(searchBox.value);
+        });
+
+        checkWeather("New York");
+    </script>
+</body>
+</html>
